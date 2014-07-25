@@ -7,6 +7,55 @@
 (function(Ember, d3) {
 
   /**
+    Contains logic for applying transitions in an array context.
+
+    @namespace Ember.d3
+    @class ArrayTransition 
+    @constructor
+    @param transition {Ember.d3.Transition} the transition object this is built off of.
+    @param keyName {String} the key of the array property to iterate over
+  */
+  var ArrayTransition = (function(){
+    function ArrayTransition(transition, keyName){
+      this.__transition = transition;
+      this.__keyName = keyName;
+      this.baseArray = function() {
+        return transition.__emberObject.get(keyName);
+      };
+    }
+
+    ArrayTransition.prototype.delay = function(delay) {
+      this.__transition.delay(delay);
+      return this;
+    };
+
+    ArrayTransition.prototype.duration = function(duration) {
+      this.__transition.duration(duration);
+      return this;
+    };
+
+    ArrayTransition.prototype.ease = function(easing) {
+      this.__transition.ease(easing);
+      return this;
+    };
+
+    ArrayTransition.prototype.set = function(keyName, value) {
+      var self = this;
+      var arr = this.baseArray();
+
+      var valueFn = typeof value === 'function' ? value : function() { return value; };
+
+      arr.forEach(function(item, index) {
+        self.__transition.__innerSet(item, keyName, valueFn(item, index));
+      });
+
+      return this;
+    };
+
+    return ArrayTransition;
+  }());
+
+  /**
     A transition object. contains methods and logic to affect
     setting and getting values on an {Ember.Object} via d3 easing and 
     interpolation.
@@ -25,16 +74,7 @@
 
       self.__emberObject = emberObject;
       
-      self.__finalizeFn = function(){};
-
-      self.__timerFn = function(elapsed){
-        if(elapsed / self.duration > 1) {
-          self.__finalizeFn();
-          return true;
-        } else {
-          return false;
-        }
-      };
+      self.__timerFn = function(){};
     }
 
     /**
@@ -117,8 +157,12 @@
       value of that function is used to determine the final transition value.
     */
     Transition.prototype.set = function(keyName, value){
+      this.__innerSet(this.__emberObject, keyName, value);      
+      return this;
+    };
+
+    Transition.prototype.__innerSet = function(obj, keyName, value){
       var self = this;
-      var obj = self.__emberObject;
       var easing = self.__ease;
       var a = self.__ease_a;
       var b = self.__ease_b;
@@ -131,7 +175,7 @@
       };
       
       var ease = d3.ease(easing, a, b);
-      var oldValue = obj.get(keyName) || null;
+      var oldValue = Ember.get(obj, keyName) || null;
       var interpolator = d3.interpolate(oldValue, valueFn(oldValue));
       
       var kill = false;  
@@ -139,20 +183,23 @@
         kill = true;
       };
 
+      obj.__transitions = obj.__transitions || {};
       var currentTransition = obj.__transitions[keyName];
       
       obj.__transitions[keyName] = self;
       
       // Build the timer function out
-      var nextTimerFn = self.__timerFn;
+      var prevTimerFn = self.__timerFn;
       self.__timerFn = function(elapsed){
         if(kill) {
           delete obj.__transitions[keyName];
           return true;
         }
         
+        var prev = prevTimerFn(elapsed);
+        
         if(currentTransition && currentTransition !== self) {
-          oldValue = obj.get(keyName) || null;
+          oldValue = Ember.get(obj, keyName) || null;
           interpolator = d3.interpolate(oldValue, valueFn(oldValue));
           currentTransition.kill();
           currentTransition = self;
@@ -160,28 +207,25 @@
         
         var t = elapsed / duration;
         var v = ease(t);
-        obj.set(keyName, interpolator(v));
+        Ember.set(obj, keyName, interpolator(v));
 
-        nextTimerFn(elapsed);
-      };
-
-      // Build the finalization function out.
-      var nextFinalizeFn = self.__finalizeFn;
-      self.__finalizeFn = function(){
-        obj.set(keyName, valueFn());
-        nextFinalizeFn();
+        return prev && elapsed >= duration;
       };
 
       // make sure the timer is only kicked off once after setup.
       next(function() {
         d3.timer(self.__timerFn, delay);
-      });
-      
-      return this;
+      });      
+    };
+
+    Transition.prototype.each = function(keyName) {
+      return new ArrayTransition(this, keyName);
     };
 
     return Transition;
   }());
+
+  
 
   // timeout from last time next() was called.
   var prevTimeout;
@@ -210,15 +254,6 @@
   Ember.Object.prototype.transition = function() {
     return new Transition(this);
   };
-
-  /**
-    A hash lookup for transitions pending on this object.
-
-    @property __transitions
-    @type Object
-    @private
-  */
-  Ember.Object.prototype.__transitions = {};
 
   Ember.d3 = {};
   Ember.d3.Transition = Transition;

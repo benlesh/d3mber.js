@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<meta charset="utf-8">
+<title>Ember Starter Kit</title>
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/normalize/2.1.0/normalize.css">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars-v1.3.0.js"></script>
+  <script src="http://builds.emberjs.com/tags/v1.6.1/ember.js"></script>
+  <script src="../d3mber.js"></script>
+  <script src="index.js"></script>
+</head>
+<body>
+
+  <script type="text/x-handlebars">
+    <h2> Welcome to Ember.js with d3mber.js</h2>
+
+    <a href="http://github.com/blesh/d3mber.js">http://github.com/blesh/d3mber.js</a>
+    
+    {{outlet}}
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="index">
+    <div {{action 'moveIt'}} {{bind-attr style=myStyle}}>Come click me, bro</div>
+
+    {{#each grid}}
+      <div {{action 'moveGrid'}} {{bind-attr style=itemStyle}}>{{n}}</div>
+    {{/each}}
+  </script>
+</body>
+</html>
