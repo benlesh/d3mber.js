@@ -220,5 +220,6 @@
   */
   Ember.Object.prototype.__transitions = {};
 
+  Ember.d3 = {};
   Ember.d3.Transition = Transition;
 }(Ember, d3));
