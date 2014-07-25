@@ -1,0 +1,25 @@
+{
+  "name": "d3mber.js",
+  "version": "0.0.0",
+  "description": "An integration library for d3 and ember",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blesh/d3mber.js.git"
+  },
+  "keywords": [
+    "D3js",
+    "EmberJS",
+    "D3",
+    "Ember"
+  ],
+  "author": "Ben Lesh <ben@benlesh.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/blesh/d3mber.js/issues"
+  },
+  "homepage": "https://github.com/blesh/d3mber.js"
+}
