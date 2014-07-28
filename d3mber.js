@@ -74,7 +74,9 @@
 
       self.__emberObject = emberObject;
       
-      self.__timerFn = function(){};
+      self.__timerFn = function(){
+        return true;
+      };
     }
 
     /**
