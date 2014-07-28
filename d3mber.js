@@ -104,10 +104,10 @@
 
       @property __ease
       @type String
-      @default 'cubic-in-out'
+      @default null
       @private
     */
-    Transition.prototype.__ease = 'cubic-in-out';
+    Transition.prototype.__ease = null;
 
     /**
       Sets the delay for the transition. The delay determines how long
@@ -176,7 +176,7 @@
         return value;
       };
       
-      var ease = d3.ease(easing, a, b);
+      var ease = easing ? d3.ease(easing, a, b) : null;
       var oldValue = Ember.get(obj, keyName) || null;
       var interpolator = d3.interpolate(oldValue, valueFn(oldValue));
       
@@ -208,7 +208,7 @@
         }
         
         var t = elapsed / duration;
-        var v = ease(t);
+        var v = ease ? ease(t) : t;
         Ember.set(obj, keyName, interpolator(v));
 
         return prev && elapsed >= duration;

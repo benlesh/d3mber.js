@@ -6,7 +6,7 @@ App.Router.map(function() {
 App.IndexRoute = Ember.Route.extend({
   model: function() {
 
-    var grid = d3.range(500).map(function(n) {
+    var grid = d3.range(200).map(function(n) {
       var perRow = 20;
       var x = (n % perRow) * 70;
       var y = Math.floor(n / perRow) * 70;
@@ -42,7 +42,7 @@ App.IndexController = Ember.ObjectController.extend({
       
       // HERE IS THE COOL PART!!!!!
       this.transition().duration(1200)
-        .ease('elastic')
+        .ease()
         .set('foo', 500)
         .set('bgColor', '#00ff00');
     },
@@ -50,7 +50,6 @@ App.IndexController = Ember.ObjectController.extend({
     moveGrid: function(){
 
       this.transition().duration(5000)
-        .ease('elastic')
         .each('grid')
         .set('itemStyle', function(d) {
           d.x += 500;
