@@ -104,10 +104,10 @@
 
       @property __ease
       @type String
-      @default 'linear'
+      @default 'cubic-in-out'
       @private
     */
-    Transition.prototype.__ease = 'linear';
+    Transition.prototype.__ease = 'cubic-in-out';
 
     /**
       Sets the delay for the transition. The delay determines how long
@@ -145,7 +145,7 @@
       @chainable
     */
     Transition.prototype.ease = function(easing, a, b) {
-      this.__ease = easing || 'ease';
+      this.__ease = easing || 'cubic-in-out';
       this.__ease_a = a || 1;
       this.__ease_b = b || 0.4;
       return this;
