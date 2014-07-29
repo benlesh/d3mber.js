@@ -20,5 +20,9 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "devDependencies": {
+    "ember": "~1.6.1",
+    "d3": "~3.4.11"
+  }
 }

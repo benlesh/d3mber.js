@@ -216,11 +216,27 @@
       };
 
       // make sure the timer is only kicked off once after setup.
-      next(function() {
-        d3.timer(self.__timerFn, delay);
-      });      
+      self.__execute();     
     };
 
+    Transition.prototype.__execute = function() {
+      var self = this;
+      
+      if(self.__nextTimeout) {
+        clearTimeout(self.__nextTimeout);
+      }
+
+      self.__nextTimeout = setTimeout(function(){
+        d3.timer(self.__timerFn, self.__delay);
+      }, 0);
+    };
+
+    /**
+      Starts building an array transition from this transition.
+      @method each
+      @param keyName {String} the key of the array property to enumerate
+      @return {ArrayTransition}
+    */
     Transition.prototype.each = function(keyName) {
       return new ArrayTransition(this, keyName);
     };
@@ -230,18 +246,6 @@
 
   
 
-  // timeout from last time next() was called.
-  var prevTimeout;
-
-  // only fires the last function passed to it in a single
-  // event loop run. (I butchered that description)
-  function next(fn) {
-    if(prevTimeout) {
-      clearTimeout(prevTimeout);
-    }
-
-    prevTimeout = setTimeout(fn, 0);
-  }
 
   /**
     This library extends the Ember.Object.prototype
