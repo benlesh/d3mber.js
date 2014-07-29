@@ -185,8 +185,9 @@
         kill = true;
       };
 
-      obj.__transitions = obj.__transitions || {};
-      var currentTransition = obj.__transitions[keyName];
+      var __transitions = obj.get('__transitions') || {};
+      obj.set('__transitions', __transitions);
+      var currentTransition = Ember.get(__transitions, keyName);
       
       obj.__transitions[keyName] = self;
       
@@ -194,7 +195,7 @@
       var prevTimerFn = self.__timerFn;
       self.__timerFn = function(elapsed){
         if(kill) {
-          delete obj.__transitions[keyName];
+          obj.set(keyName, undefined);
           return true;
         }
         
