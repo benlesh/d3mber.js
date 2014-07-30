@@ -262,6 +262,43 @@
     return new Transition(this);
   };
 
+  var origTimerFn = d3.timer;
+
+  /**
+    Enables or disables test mode. Used to force the timer to execute immediately.
+
+    @method testMode
+    @param test {Boolean} enable or disable test mode.
+    @param o {Object} an optional configuration object
+    @example
+
+            Ember.d3.Transition.testMode(true, {
+              timerMax: 100000, // default
+            });
+  */
+  Transition.testMode = function(test, o){
+    var config = {
+      timerMax: 100000
+    };
+
+    if(o) {
+      for(var key in o) {
+        if(o.hasOwnProperty(key)) {
+          config[key] = o[key];
+        }
+      }
+    }
+
+    if(test) {
+      d3.timer = function(fn) {
+        var i = 1;
+        while(!fn(i++) && i < config.timerMax) {}
+      };
+    } else {
+      d3.timer = origTimerFn;
+    }
+  };
+
   Ember.d3 = {};
   Ember.d3.Transition = Transition;
 }(Ember, d3));

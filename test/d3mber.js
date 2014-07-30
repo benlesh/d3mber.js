@@ -62,4 +62,34 @@ describe('Ember.d3.Transition', function(){
 			});
 		});
 	});
+
+	describe('Transition.testMode()', function(){
+		it('should force the d3 timer to run immediately', function(){
+			spyOn(d3, 'timer');
+			var d3Timer = d3.timer;
+
+			Ember.d3.Transition.testMode(true);
+			var i = 0;
+			var duration = 1000;
+			d3.timer(function(ms) {
+				i++;
+				return ms >= duration;
+			}, 100);
+
+			waits(0);
+
+			runs(function(){
+				expect(i).toBe(duration);
+				expect(d3Timer).not.toHaveBeenCalled();
+			});
+		});
+
+		it('should turn off properly', function(){
+			var origTimer = d3.timer;
+			Ember.d3.Transition.testMode(true);
+			expect(d3.timer).not.toBe(origTimer);
+			Ember.d3.Transition.testMode(false);
+			expect(d3.timer).toBe(origTimer);
+		});
+	});
 });
