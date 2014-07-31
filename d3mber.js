@@ -207,7 +207,7 @@
 
     Transition.prototype.executeTimer = function(){
       var delay = this.config.delay;
-      this.stopPriorTransitions()();
+      this.stopPriorTransitions();
       this.register();
       d3.timer(this.timerCallback, delay);
     };
@@ -299,9 +299,10 @@
     }
   };
 
-  Ember.d3 = {};
-  Ember.d3.Transition = Transition;
-
+  Ember.d3 = {
+    Transition: Transition,
+    ArrayTransition: ArrayTransition,
+  };
 
   function extend(target, source) {
     if(!target || !source) {
