@@ -227,7 +227,12 @@
       }
 
       self.__nextTimeout = setTimeout(function(){
-        d3.timer(self.__timerFn, self.__delay);
+        d3.timer(function() {
+          var timerArgs = [].slice.call(arguments);
+          Ember.run(function(){
+            self.__timerFn.apply(this, timerArgs);
+          });
+        }, self.__delay);
       }, 0);
     };
 
