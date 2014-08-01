@@ -21,21 +21,56 @@
       this.arrayKeyName = arrayKeyName;
     }
 
+    /**
+      Sets the delay before the transition starts
+      @method delay
+      @param delay {Number} the delay in milliseconds
+      @chainable
+    */
     ArrayTransition.prototype.delay = function(delay) {
       this.transition.delay(delay);
       return this;
     };
 
+    /**
+      Sets the duration of the transition in milliseconds
+      @method duration
+      @param duration {Number} the duration in ms
+      @chainable
+    */
     ArrayTransition.prototype.duration = function(duration) {
       this.transition.duration(duration);
       return this;
     };
 
+    /**
+      Sets the d3 easing function to be used for the transition
+      @method ease
+      @param easing {String} the name of the type of easing to use. 
+      @chainable
+    */
     ArrayTransition.prototype.ease = function(easing) {
       this.transition.ease(easing);
       return this;
     };
 
+    /**
+      Sets the value on the specified property in each item in the array over the
+      period of the transition. Starts the transition's execution.
+      @method set
+      @param keyName {String} the name of the property on each array item to set
+      @param value If the value is a {Function} then it will execute that function and use the return
+      value as the value to set the the property to. If it's not a function, it will just use that as the 
+      new value.
+      @chainable
+      @example
+
+              this.transition.each('myArray')
+                  .set('foo', function(item, i) {
+                    return item.bar + 20;
+                  })
+                  .set('blah', 42);
+    */
     ArrayTransition.prototype.set = function(keyName, value) {
       var transition = this.transition;
       var obj = transition.emberObject;
@@ -273,9 +308,20 @@
     Creates a new transition for the object.
     @method transition
     @returns {Ember.d3.Transition}
+    @param {Object} optional configuration for the transition.
+    @example
+
+            this.transition({
+              duration: 1000,
+              delay: 5,
+            }).set('foo', 123);
+
+            // or use defaults
+
+            this.transition().set('foo', 123);
   */
-  Ember.Object.prototype.transition = function() {
-    return new Transition(this);
+  Ember.Object.prototype.transition = function(config) {
+    return new Transition(this, config);
   };
 
   var origTimerFn = d3.timer;
