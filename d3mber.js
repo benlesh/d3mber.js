@@ -196,7 +196,14 @@
     Transition.prototype.innerSet = function(obj, keyName, value){
       var oldValue = Ember.get(obj, keyName);
       var newValue = typeof value === 'function' ? value(oldValue) : value;
+      
+      if(Ember.d3.TEST_MODE) {
+        Ember.set(obj, keyName, value);
+        return;
+      }
+
       var interpolator = d3.interpolate(oldValue, newValue);
+
       this.sets.push({ 
         obj: obj,
         keyName: keyName,
@@ -223,6 +230,10 @@
       var executionTimeout = this.executionTimeout;
       var self = this;
 
+      if(Ember.d3.TEST_MODE) {
+        return;
+      }
+
       if(executionTimeout) {
         clearTimeout(executionTimeout);
       }
@@ -231,7 +242,7 @@
         self.executeTimer()
       }, 0);
     };
-
+    
     /**
       Immediately executes the transition. Also stops any previous transition on the ember object.
       @method executeTimer
@@ -324,46 +335,10 @@
     return new Transition(this, config);
   };
 
-  var origTimerFn = d3.timer;
-
-  /**
-    Enables or disables test mode. Used to force the timer to execute immediately.
-
-    @method testMode
-    @param test {Boolean} enable or disable test mode.
-    @param o {Object} an optional configuration object
-    @example
-
-            Ember.d3.Transition.testMode(true, {
-              timerMax: 100000, // default
-            });
-  */
-  Transition.testMode = function(test, o){
-    var config = {
-      timerMax: 100000
-    };
-
-    if(o) {
-      for(var key in o) {
-        if(o.hasOwnProperty(key)) {
-          config[key] = o[key];
-        }
-      }
-    }
-
-    if(test) {
-      d3.timer = function(fn) {
-        var i = 1;
-        while(!fn(i++) && i < config.timerMax) {}
-      };
-    } else {
-      d3.timer = origTimerFn;
-    }
-  };
-
   Ember.d3 = {
     Transition: Transition,
     ArrayTransition: ArrayTransition,
+    TEST_MODE: false
   };
 
   function extend(target, source) {

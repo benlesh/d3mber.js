@@ -79,35 +79,26 @@ describe('Ember.d3.Transition', function(){
 		});
 	});
 
-	describe('Transition.testMode()', function(){
-		it('should force the d3 timer to run immediately', function(){
-			spyOn(d3, 'timer');
-			var d3Timer = d3.timer;
-
-			Ember.d3.Transition.testMode(true);
-			var i = 0;
-			var duration = 1000;
-			d3.timer(function(ms) {
-				i++;
-				return ms >= duration;
-			}, 100);
-
-			waits(0);
-
-			runs(function(){
-				expect(i).toBe(duration);
-				expect(d3Timer).not.toHaveBeenCalled();
-
-				Ember.d3.Transition.testMode(false);
-			});
+	describe('Ember.d3.TEST_MODE', function(){
+		beforeEach(function(){
+			Ember.d3.TEST_MODE = true;
 		});
 
-		it('should turn off properly', function(){
-			var origTimer = d3.timer;
-			Ember.d3.Transition.testMode(true);
-			expect(d3.timer).not.toBe(origTimer);
-			Ember.d3.Transition.testMode(false);
-			expect(d3.timer).toBe(origTimer);
+		afterEach(function(){
+			Ember.d3.TEST_MODE = false;
+		});
+
+		it('should set values right away and prevent executeTimer from firing', function(){
+			var obj = Ember.Object.create();
+			var trans = obj.transition();
+			trans.executionTimeout = 'unchanged';
+
+			trans.set('foo', 1);
+			trans.set('bar', 2);
+
+			expect(obj.get('foo'), 1);
+			expect(obj.get('bar'), 2);
+			expect(typeof obj.executionTimeout).toBe('undefined');
 		});
 	});
 
