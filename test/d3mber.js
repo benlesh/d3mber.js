@@ -3,16 +3,27 @@ describe('Ember.d3.Transition', function(){
 		expect(typeof Ember.d3.Transition).toBe('function');
 	});
 
-	describe('Transition.prototype.__execute', function(){
+	describe('config', function(){
+		it('should have a default config', function(){
+			var obj = Ember.Object.create();
+			var trans = obj.transition();
+
+			expect(typeof trans.config).toBe('object');
+			expect(trans.config.delay).toBe(0);
+			expect(trans.config.duration).toBe(400);
+		});
+	});
+
+	describe('Transition.prototype.execute', function(){
 		it('should call d3.timer only once', function(){
 			spyOn(d3, 'timer');
 
 			var obj = Ember.Object.create();
 			var trans = obj.transition();
 
-			trans.__execute();
-			trans.__execute();
-			trans.__execute();
+			trans.execute();
+			trans.execute();
+			trans.execute();
 
 			waits(30);
 
@@ -22,22 +33,21 @@ describe('Ember.d3.Transition', function(){
 		});
 	});
 
-	describe('Transition.prototype.__emberObject', function(){
+	describe('Transition.prototype.emberObject', function(){
 		it('should be the creating instance of an Ember.Object', function(){
 			var obj = Ember.Object.create();
 			var trans = obj.transition();
-			expect(trans.__emberObject).toBe(obj);
+			expect(trans.emberObject).toBe(obj);
 		});
 	});
 
-	describe('Transition.prototype.__innerSet', function(){
-		it('should chain all sets together in __timerFn and call __execute each time it is called', function(){
+	describe('Transition.prototype.set', function(){
+		it('should append to .sets and call .execute each time it is called', function(){
 			var obj = Ember.Object.create();
 			var trans = obj.transition();
 			var calls = [];
 
-			spyOn(Ember, 'set');
-			spyOn(trans, '__execute');
+			spyOn(trans, 'execute');
 
 			var args = [
 				['foo', 100],
@@ -49,16 +59,14 @@ describe('Ember.d3.Transition', function(){
 				trans.set(x[0], x[1]);
 			});
 
-			trans.__timerFn(0);
+			trans.timerCallback(0);
 
-			Ember.set.calls.forEach(function(call, i) {
-				expect(call.args[0]).toBe(obj, args[i][0], args[i][1]);
-			});
-
+			expect(trans.sets.length).toBe(3);
+			
 			waits(10);
 
 			runs(function(){
-				expect(trans.__execute.calls.length).toBe(3);
+				expect(trans.execute.calls.length).toBe(3);
 			});
 		});
 	});

@@ -72,9 +72,7 @@
       this.sets = [];
       this.config = {};
       extend(this.config, Transition.config); // defaults
-      extend(this.config, config); // custom
-
-      
+      extend(this.config, config); // custom      
     }
 
     Transition.prototype.register = function(){
@@ -173,11 +171,16 @@
     Transition.prototype.executionTimeout = null;
 
     Transition.prototype.execute = function() {
-      if(this.executionTimeout) {
-        clearTimeout(this.executionTimeout);
+      var executionTimeout = this.executionTimeout;
+      var self = this;
+
+      if(executionTimeout) {
+        clearTimeout(executionTimeout);
       }
 
-      this.executionTimeout = setTimeout(this.executeTimer, 0);
+      this.executionTimeout = setTimeout(function(){
+        self.executeTimer()
+      }, 0);
     };
 
     Transition.prototype.stopPriorTransitions = function(){
